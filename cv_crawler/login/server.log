@@ -1,0 +1,27 @@
+INFO 09/17 14:05:03 o.b.p.Main           - Starting BrowserMob Proxy version 2.0-beta-6
+INFO 09/17 14:05:04 o.e.j.u.log          - jetty-7.3.0.v20110203
+INFO 09/17 14:05:04 o.e.j.u.log          - started o.e.j.s.ServletContextHandler{/,null}
+WARN 09/17 14:05:04 o.e.j.u.log          - FAILED SelectChannelConnector@0.0.0.0:40000: java.net.BindException: Address already in use: bind
+WARN 09/17 14:05:04 o.e.j.u.log          - FAILED org.eclipse.jetty.server.Server@63a12c68: java.net.BindException: Address already in use: bind
+Exception in thread "main" java.net.BindException: Address already in use: bind
+	at sun.nio.ch.Net.bind0(Native Method)
+	at sun.nio.ch.Net.bind(Unknown Source)
+	at sun.nio.ch.Net.bind(Unknown Source)
+	at sun.nio.ch.ServerSocketChannelImpl.bind(Unknown Source)
+	at sun.nio.ch.ServerSocketAdaptor.bind(Unknown Source)
+	at org.eclipse.jetty.server.nio.SelectChannelConnector.open(SelectChannelConnector.java:162)
+	at org.eclipse.jetty.server.AbstractConnector.doStart(AbstractConnector.java:356)
+	at org.eclipse.jetty.server.nio.SelectChannelConnector.doStart(SelectChannelConnector.java:240)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:55)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:269)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:55)
+	at org.browsermob.proxy.Main.main(Main.java:46)
+:9092
+INFO 09/17 14:05:03 o.b.p.j.u.Container  - Started org.browsermob.proxy.jetty.jetty.Server@220c6444
+INFO 09/17 14:05:08 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61413
+INFO 09/17 14:05:09 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61419
+INFO 09/17 14:05:11 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61427
+INFO 09/17 14:05:11 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61429
+INFO 09/17 14:05:12 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61431
+INFO 09/17 14:05:13 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61440
+INFO 09/17 14:05:14 o.b.p.j.h.SocketLis~ - Started SocketListener on 0.0.0.0:61443
