@@ -43,7 +43,7 @@ class ZhilianCaptcha(object):
         :param image: cv2 image
         :return: normal image file
         """
-        with tempfile.NamedTemporaryFile(prefix='liepin_', suffix='.jpg') as tmp:
+        with tempfile.NamedTemporaryFile(prefix='zhilian', suffix='.jpg') as tmp:
             cv2.imwrite(tmp.name, image)
             with open(tmp.name) as f:
                 return f.read()
@@ -53,8 +53,8 @@ class ZhilianCaptcha(object):
         slices = []
         height, width, dimen = cv2_image.shape
         print(height, width)
-        ws = width / nw
-        hs = height / nh
+        ws = width // nw
+        hs = height // nh
         for i in range(0, nh):
             for j in range(0, nw):
                 slices.append(cv2_image[i * hs:(i + 1) * hs, j * ws:(j + 1) * ws, :])
@@ -70,12 +70,12 @@ class ZhilianCaptcha(object):
         for i in range(0, len(seq)):
             idx_dict[seq[i]] = i
         img = np.zeros((h, w, 3), dtype=np.uint8)
-        s = w / len(seq) * 2
-        sh = h / 2
-        c = len(seq) / 2
+        s = w // len(seq) * 2
+        sh = h // 2
+        c = len(seq) // 2
         for i in idx_dict:
             y = i % c
-            x = i / c
+            x = i // c
             try:
                 img[x * sh:(x + 1) * sh, y * s:(y + 1) * s, :] = slices[seq[i]]
             except ValueError:

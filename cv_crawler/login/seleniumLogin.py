@@ -4,7 +4,9 @@ import time
 
 import re
 from platform import system
-from browsermobproxy import Server
+
+import chardet
+from browsermobproxy import Server,Client
 from selenium.webdriver import FirefoxProfile, DesiredCapabilities, Firefox, ActionChains
 from cv_crawler.common.logManager import get_logger
 from cv_crawler.login.xvfb import Xvfb
@@ -27,7 +29,7 @@ def get_browsermob_proxy():
     raise RuntimeError("failed to find browsermob-proxy path")
 
 def start_firefox(proxy=None, user_agent=None):
-    p = FirefoxProfile()
+    p = FirefoxProfile("E://profiles")
     p.accept_untrusted_certs = True
     if user_agent:
         p.set_preference("general.useragent.override", user_agent)
@@ -40,7 +42,7 @@ def start_firefox(proxy=None, user_agent=None):
     return browser
 
 class SeleniumLoginHacker(object):
-    def __init__(self, server_port=40001, chained_proxy=None, proxy_username=None, proxy_passowrd=None, is_https=False,
+    def __init__(self, server_port=40000, chained_proxy=None, proxy_username=None, proxy_passowrd=None, is_https=False,
                  user_agent=None):
         self.account = {'u': 'username', 'p': 'password'}
         self.proxy_server = None
