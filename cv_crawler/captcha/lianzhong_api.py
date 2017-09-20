@@ -1,14 +1,19 @@
 # coding: utf-8
+import base64
 import json
 import os
+
+import chardet
 import requests
 import time
 user = 'lilian'
 pwd = 'Lilian123456'
 post_url = 'http://v1-http-api.jsdama.com/api.php?mod=php&act=upload'
+softwareId = '7783'
+softwareSecret = 'RKM936henz3OzGgpg9c8UCViQ32lCqwhO8cCOqyG',
 
 def get_coordinate(api_username=user, api_password=pwd, image='', api_post_url=post_url,
-                   yzm_min='', yzm_max='', yzm_type='1314', tools_token=''):
+                   yzm_min='1', yzm_max='8', yzm_type='1314', tools_token=''):
     '''
             main() 参数介绍
             api_username    （API账号）             --必须提供
@@ -29,8 +34,8 @@ def get_coordinate(api_username=user, api_password=pwd, image='', api_post_url=p
     # yzm_max = '8'
     # yzm_type = '1303'
     # tools_token = api_username
-    file_name = os.getcwd() + '\captcha_image\%d.png' % int(time.time())
-    with open(file_name, 'w+') as f:
+    file_name = os.getcwd() + '\\%d.png' % int(time.time())
+    with open(file_name, 'wb+') as f:
         f.write(image)
         f.flush()
     # proxies = {'http': 'http://127.0.0.1:8888'}
@@ -55,7 +60,8 @@ def get_coordinate(api_username=user, api_password=pwd, image='', api_post_url=p
         'yzm_minlen': yzm_min,
         'yzm_maxlen': yzm_max,
         'yzmtype_mark': yzm_type,
-        'zztool_token': tools_token
+        'zztool_token': tools_token,
+        'upload': (file_name, open(file_name, 'rb'), 'image/png')
     }
     s = requests.session()
     r = s.post(api_post_url, headers=headers, data=data, files=files, verify=False)
@@ -69,6 +75,47 @@ def get_coordinate(api_username=user, api_password=pwd, image='', api_post_url=p
         print(r.text)
         return 0
 
+def resolve(image, minlen=2, maxlen=20, _type=68):
+    """
+    识别验证码
+    :param imgge: 验证码图片或文件
+    :param minlen: 验证码要识别的字符的最小个数
+    :param maxlen: 验证码最大个数
+    :param _type: 类型,普通验证码填0，点击式验证码68，点击式验证码 maxlen,minlen放空，即maxlen='',minlen=''
+    :return:
+    """
+    # 'brantbzhang', 'p': 'heLlo_Ipin@l234
+    data = {
+        'username': user,
+        'password': pwd,
+        'captchaMaxLength': maxlen,
+        'captchaMinLength': minlen,
+        'captchaType': _type,
+        'softwareId': softwareId,
+        'softwareSecret': softwareSecret,
+        'captchaData': base64.b64encode(image).decode('utf-8')
+    }
+    HEADERS = {'Content-Type': 'application/json'}
+    PROCESS_URL = 'https://v2-api.jsdama.com/upload'
+    # files = {'upload': ('a.jpg', img)}
+
+    # time.sleep(3)
+    # print json.dumps(data, indent=4)
+    # self.set_proxy('192.168.1.251:5000')
+    con = requests.post(PROCESS_URL, data=json.dumps(data), headers=HEADERS)
+    if con is None:
+        return False
+    print('====>lianzhong.result:', con.text)
+    j = json.loads(con.text)
+    if int(j.get('code', -1)) == 0:
+        lastid = j['data']['captchaId']
+        return j['data']['recognition']
+    elif u"已经损坏或者不是正确的图像格式" in j.get("message", u""):
+        return False
+    else:
+        print(json.dumps(j, indent=4))
+        # raise Exception(u"联众服务返回异常数据[%s]" % con.text)
+        return False
 
 if __name__ == '__main__':
     # download_vcode()

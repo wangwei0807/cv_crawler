@@ -3,7 +3,7 @@ import tempfile
 import numpy as np
 import cv2
 
-from cv_crawler.captcha.lianzhong_api import get_coordinate
+from cv_crawler.captcha.lianzhong_api import get_coordinate, resolve
 
 
 class ZhilianCaptcha(object):
@@ -43,10 +43,13 @@ class ZhilianCaptcha(object):
         :param image: cv2 image
         :return: normal image file
         """
-        with tempfile.NamedTemporaryFile(prefix='zhilian', suffix='.jpg') as tmp:
-            cv2.imwrite(tmp.name, image)
-            with open(tmp.name) as f:
-                return f.read()
+        # with tempfile.NamedTemporaryFile(prefix='zhilian', suffix='.jpg') as tmp:
+        #     cv2.imwrite(tmp.name, image)
+        #     with open(tmp.name) as f:
+        #         return f.read()
+        cv2.imwrite('E://profiles//zhilian.jpg', image)
+        with open('E://profiles//zhilian.jpg', 'rb') as f:
+            return f.read()
 
     @staticmethod
     def split_image(cv2_image, nw, nh):
@@ -95,7 +98,7 @@ class ZhilianCaptcha(object):
 
     def resolve(self, **kwargs):
         image = self.cv2raw(self.captcha)
-        res = get_coordinate(image=image)
+        res = resolve(image=image)
         if not res:
             return []
         coordinates = []
