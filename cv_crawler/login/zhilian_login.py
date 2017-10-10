@@ -34,9 +34,10 @@ class ZLLogin(object):
         self.session = requests.session()
         self.user_agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'
         self.hacker = SeleniumLoginHacker(user_agent=self.user_agent, server_port=server_port)
-
+        self.cookies = {}
         self.test_kw = ['销售', '产品经理', '财务', '金融', '交互设计', '开发']
         self.token = None
+        self.cansearch = 0
         self.search_url = 'https://ihr.zhaopin.com/ihrapi/resume/resumesearch'
 
     def get_token(self):
@@ -72,8 +73,8 @@ class ZLLogin(object):
         }
         header = {'Referer': 'http://ihr.zhaopin.com/resumesearch/search/?keyword=%s' % data['keywords'],
                   'X-Requested-With': "XMLHttpRequest"}
-        testsearch_url = 'https://ihr.zhaopin.com/ihrapi/resume/resumesearch?access_token=%s' % self.token
-        con1 = self.session.get(testsearch_url, data=data, headers=header)
+        testsearch_url = 'https://ihr.zhaopin.com/resumesearch/search.do?access_token=%s' % self.token
+        con1 = self.session.post(testsearch_url, data=json.dumps(data), headers=header)
         try:
             js = json.loads(con1.text.encode('utf-8'))
             num = js.get('numFound', '')
@@ -97,6 +98,9 @@ class ZLLogin(object):
     def do_login(self):
         # self.hacker.update_chained_proxy('169.45.120.54:3128', 'shein', 'helloshein', True)# 代理地址，验证用户名，验证密码, 是否支持https
         cookies, page_source = self.hacker.hack2(self.account, captcha_resolver=self.resolve_captcha)
+        self.apply_cookie(cookies)
+        path = '/'.join((os.getcwd(), 'cookie'))
+        self.cookie_to_disk(path)
         if page_source is None:
             print('----con is None')
             self.login_state = '网络请求失败'
@@ -112,14 +116,16 @@ class ZLLogin(object):
                     return
                 url = m.group(1).strip('\'"')
                 self.logger.info("decrypted redirected url: %s", url)
-                if '/' in url:
-                    url = jsc_split_str(url)
-                else:
-                    url = jsc_decode(url)
+                # if '/' in url:
+                #     url = jsc_split_str(url)
+                # else:
+                #     url = jsc_decode(url)
             self.apply_cookie(cookies)
-            self.handle_login_redirect(url)
+            path = '/' .join((os.getcwd(), 'cookie'))
+            self.cookie_to_disk(path)
+            # self.handle_login_redirect(url)
             # self.save_cookie_file('cookies.txt')
-            self._test_search()
+            # self._test_search()
             return True
         elif u'请选择你要登入的系统' in page_source:
             self.apply_cookie(cookies)
@@ -172,18 +178,23 @@ class ZLLogin(object):
 
     def apply_cookie(self, cookies):
         for ck in cookies:
-            if "FSSBBIl1UgzbN7N" in ck['name']:
-                self.add_cookie('rdsearch.zhaopin.com', ck['name'], ck['value'], expires=ck['expiry'],
-                                secure=ck['secure'],
-                                path=ck['path'])
-                self.add_cookie('rd2.zhaopin.com', ck['name'], ck['value'], expires=ck['expiry'],
-                                secure=ck['secure'],
-                                path=ck['path'])
-            self.add_cookie(ck['domain'], ck['name'], ck['value'], expires=ck['expiry'], secure=ck['secure'],
-                            path=ck['path'])
+            self.cookies[ck['name']] = ck['value']
+            self.session.cookies.set(ck['name'], ck['value'], domain=ck['domain'], path=ck['path'])
+            # if "FSSBBIl1UgzbN7N" in ck['name']:
+            #     self.cookies.append('rdsearch.zhaopin.com', ck['name'], ck['value'], expires=ck['expiry'],
+            #                     secure=ck['secure'],
+            #                     path=ck['path'])
+            #     self.add_cookie('rd2.zhaopin.com', ck['name'], ck['value'], expires=ck['expiry'],
+            #                     secure=ck['secure'],
+            #                     path=ck['path'])
+            # self.add_cookie(ck['domain'], ck['name'], ck['value'], expires=ck['expiry'], secure=ck['secure'],
+            #                 path=ck['path'])
 
-    def add_cookie(self, domain, name, value, domain_specified="?", path="/", secure="FALSE", expires=0):
-        pass
+    def find_value(self, cookies, domain, key):
+        v = cookies.get(domain, {}).get('/', {}).get(key, None)
+        if v:
+            return v.value
+        return None
 
     def handle_login_redirect(self, url):
         con = self.session.get(url)
@@ -198,6 +209,10 @@ class ZLLogin(object):
         else:
             self._old_version = "Location: https://ihr.zhaopin.com" not in con.headers
 
+    def cookie_to_disk(self, name='cookie'):
+        with open(name, 'w+') as f:
+            f.write(json.dumps(self.cookies))
+            f.flush()
 
 __encrypted_short_str__ = "qrcklmDoExthWJiHAp1sVYKU3RFMQw8IGfPO92bvLNj.7zXBaSnu0TC6gy_4Ze5d"
 

@@ -9,8 +9,8 @@ import time
 user = 'lilian'
 pwd = 'Lilian123456'
 post_url = 'http://v1-http-api.jsdama.com/api.php?mod=php&act=upload'
-softwareId = '7783'
-softwareSecret = 'RKM936henz3OzGgpg9c8UCViQ32lCqwhO8cCOqyG',
+softwareId = 7783
+softwareSecret = 'RKM936henz3OzGgpg9c8UCViQ32lCqwhO8cCOqyG'
 
 def get_coordinate(api_username=user, api_password=pwd, image='', api_post_url=post_url,
                    yzm_min='1', yzm_max='8', yzm_type='1314', tools_token=''):
@@ -95,7 +95,7 @@ def resolve(image, minlen=2, maxlen=20, _type=68):
         'softwareSecret': softwareSecret,
         'captchaData': base64.b64encode(image).decode('utf-8')
     }
-    HEADERS = {'Content-Type': 'application/json'}
+    HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json, text/javascript, */*; q=0.01'}
     PROCESS_URL = 'https://v2-api.jsdama.com/upload'
     # files = {'upload': ('a.jpg', img)}
 
